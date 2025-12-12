@@ -20,14 +20,14 @@ function [] = ber_per_over_snr()
     fprintf('Starting at %s\n', datestr(now,'HH:MM:SS'));
     
     % choose mcs to simulate and maximum number of HARQ re-transmissions
-    mcs = [1,2,3,4];
+    mcs = [0,1,2,3,4];
     harq_retransmissions = 0;
     
     % simulation range for link level simulation
-    snr_db = -10:1.0:30;
+    snr_db = 0:0.5:20;
     
     % Packets per mcs and snr. Increase this number to get smoother curves.
-    n_packets_per_snr = 100;
+    n_packets_per_snr = 100000;
     
     % result container for PCC
     n_bits_PCC_sent = zeros(numel(mcs), numel(snr_db(1,:)));        % BER uncoded
@@ -54,11 +54,11 @@ function [] = ber_per_over_snr()
         config.u = 1;
         config.b = 1;
         config.PacketLengthType = 0;
-        config.PacketLength = 2;
-        config.tm_mode_0_to_11 = 0;
+        config.PacketLength = 16;
+        config.tm_mode_0_to_11 = 0; 
         config.mcs_index = mcs(cnt);
         config.Z = 6144;
-        config.oversampling = 2;
+        config.oversampling = 1;   % there is no oversampling we will try to get the ideal vaues.
         config.codebook_index = 0;
         config.PLCF_type = 2;
         config.rv = 0;
@@ -144,7 +144,7 @@ function [result] = simulate_packets(tx_cpy, rx_cpy, snr_dB, n_packets_per_snr, 
     % create channel configuration
     channel_config                      = dectnrp_channel.config_t();
     channel_config.verbosity            = 0;
-    channel_config.type                 = 'Rician';
+    channel_config.type                 = 'AWGN';
     channel_config.N_TX                 = tx_cpy.derived.tm_mode.N_TX;
     channel_config.N_RX                 = rx_cpy.N_RX;
     channel_config.spectrum_occupied    = tx_cpy.derived.n_spectrum_occupied/tx_cpy.config.oversampling;
@@ -156,7 +156,7 @@ function [result] = simulate_packets(tx_cpy, rx_cpy, snr_dB, n_packets_per_snr, 
     channel_config.snr_db               = snr_dB;
     channel_config.r_samp_rate          = tx_cpy.derived.numerology.B_u_b_DFT*tx_cpy.config.oversampling;
     channel_config.r_max_doppler        = 1.946;
-    channel_config.r_type               = 'TDL-v';
+    channel_config.r_type               = 'TDL-ii';
     channel_config.r_DS_desired         = 10^(-7.03 + 0.00*randn());
     channel_config.r_K                  = db2pow(9.0 + 0.00*randn());
 
