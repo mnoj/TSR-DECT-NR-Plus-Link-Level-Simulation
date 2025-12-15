@@ -24,11 +24,13 @@ function [] = ber_per_over_snr()
     harq_retransmissions = 0;
     
     % simulation range for link level simulation
-    snr_db_init=[-5, -2, 1, 4]
-    snr_db = 0:0.5:20;
-    
+    snr_db_init=[-3, 0, 3, 5,9];
+    snr_db_end=snr_db_init+5;
+    snr_db_step=0.25;
+    snr_db = snr_db_init(1):snr_db_step:snr_db_end(1);              % First test vector for defining the variables.
+
     % Packets per mcs and snr. Increase this number to get smoother curves.
-    n_packets_per_snr = 100000;
+    n_packets_per_snr = 20000;
     
     % result container for PCC
     n_bits_PCC_sent = zeros(numel(mcs), numel(snr_db(1,:)));        % BER uncoded
@@ -47,6 +49,9 @@ function [] = ber_per_over_snr()
     tbs = zeros(numel(mcs), 1);
     
     for cnt = 1:numel(mcs)
+
+        snr_db = snr_db_init(cnt):snr_db_step:snr_db_end(cnt);
+
     
         % configuration is initialized with exemplary values
         config = dectnrp_tx.config_t();
@@ -55,7 +60,7 @@ function [] = ber_per_over_snr()
         config.u = 1;
         config.b = 1;
         config.PacketLengthType = 0;
-        config.PacketLength = 8;
+        config.PacketLength = 2;
         config.tm_mode_0_to_11 = 0; 
         config.mcs_index = mcs(cnt);
         config.Z = 2048;
@@ -156,7 +161,7 @@ function [result] = simulate_packets(tx_cpy, rx_cpy, snr_dB, n_packets_per_snr, 
     channel_config.err_phase            = 0;
     channel_config.snr_db               = snr_dB;
     channel_config.r_samp_rate          = tx_cpy.derived.numerology.B_u_b_DFT*tx_cpy.config.oversampling;
-    channel_config.r_max_doppler        = 1.946;
+    channel_config.r_max_doppler        = 0.0001;
     channel_config.r_type               = 'TDL-ii';
     channel_config.r_DS_desired         = 10^(-7.03 + 0.00*randn());
     channel_config.r_K                  = db2pow(9.0 + 0.00*randn());
