@@ -24,13 +24,13 @@ function [] = ber_per_over_snr()
     harq_retransmissions = 0;
     
     % simulation range for link level simulation
-    snr_db_init=[-5, -2, 1, 4,7];
-    snr_db_end=snr_db_init+6;
+    snr_db_init=[-3, 0, 3, 5,9];
+    snr_db_end=snr_db_init+5;
     snr_db_step=0.25;
     snr_db = snr_db_init(1):snr_db_step:snr_db_end(1);              % First test vector for defining the variables.
 
     % Packets per mcs and snr. Increase this number to get smoother curves.
-    n_packets_per_snr = 10000;
+    n_packets_per_snr = 20000;
     
     % result container for PCC
     n_bits_PCC_sent = zeros(numel(mcs), numel(snr_db(1,:)));        % BER uncoded
@@ -60,7 +60,7 @@ function [] = ber_per_over_snr()
         config.u = 1;
         config.b = 1;
         config.PacketLengthType = 0;
-        config.PacketLength = 4;
+        config.PacketLength = 2;
         config.tm_mode_0_to_11 = 0; 
         config.mcs_index = mcs(cnt);
         config.Z = 2048;
