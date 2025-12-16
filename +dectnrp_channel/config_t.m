@@ -57,6 +57,14 @@ classdef config_t < matlab.mixin.Copyable
             obj.sto_fractional      = 0.36;
             obj.cfo                 = 1.7*(1/(tx.derived.numerology.N_b_DFT*tx.config.oversampling));
             obj.err_phase           = deg2rad(123);
+            %Remmove SYNC Issues #Mnoj
+            obj.amp                 = 1.0;
+            obj.sto_integer         = 0;
+            obj.sto_fractional      = 0;
+            obj.cfo                 = 0;
+            obj.err_phase           = 0;
+
+
             obj.snr_db              = 30;
             
             if strcmp(obj.type, 'AWGN')

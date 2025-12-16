@@ -370,6 +370,12 @@ classdef rx_t < matlab.mixin.Copyable
             obj.sto_fractional_config = 1;
             obj.sto_residual_config = 1;
             obj.cfo_residual_config = 1;
+            
+            %Ideal case leave empty Mnoj
+
+            obj.sto_fractional_config = [ ];
+            obj.sto_residual_config = [ ];
+            obj.cfo_residual_config = [ ];
 
             % Calculating Wiener filter coefficients takes very long for large packets.
             % For basic interpolation and for testing purposes, type can be set to 'equal' to speed up the process.

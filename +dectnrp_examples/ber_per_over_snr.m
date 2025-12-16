@@ -30,7 +30,7 @@ function [] = ber_per_over_snr()
     snr_db = snr_db_init(1):snr_db_step:snr_db_end(1);              % First test vector for defining the variables.
 
     % Packets per mcs and snr. Increase this number to get smoother curves.
-    n_packets_per_snr = 25000;
+    n_packets_per_snr = 40000;
     
     % result container for PCC
     n_bits_PCC_sent = zeros(numel(mcs), numel(snr_db(1,:)));        % BER uncoded
@@ -91,7 +91,7 @@ function [] = ber_per_over_snr()
         n_packets_PDC_error_row = zeros(1, numel(snr_db));
     
         %for i=1:numel(snr_db)
-        for i=1:numel(snr_db)
+        parfor i=1:numel(snr_db)
             
             warning('off');
             

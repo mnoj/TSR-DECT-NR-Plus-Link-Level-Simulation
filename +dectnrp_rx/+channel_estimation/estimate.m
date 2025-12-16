@@ -40,7 +40,7 @@ function [ch_estim] = estimate(antenna_streams_mapped_rev, ...
 
             %% interpolation, extrapolation and smoothing
             ch_estim_i(:,:,j)  = sum(ls.*cell2mat(weights(j)),3);
-            ch_estim_i(:,:,j) =ch_estim_i(:,:,j) ./ ch_estim_i(:,:,j) ;
+            ch_estim_i(:,:,j) =  ch_estim_i(:,:,j) ./ ch_estim_i(:,:,j) ;
         end
         ch_estim(i) = {ch_estim_i};
 
