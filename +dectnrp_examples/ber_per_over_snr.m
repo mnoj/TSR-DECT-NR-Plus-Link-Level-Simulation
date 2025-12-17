@@ -25,7 +25,7 @@ function [] = ber_per_over_snr()
     
     % simulation range for link level simulation
     snr_db_init=[-2, -1, 2, 4,8];
-    snr_db_end=snr_db_init+5;
+    snr_db_end=snr_db_init+6;
     snr_db_step=0.25;
     snr_db = snr_db_init(1):snr_db_step:snr_db_end(1);              % First test vector for defining the variables.
 
