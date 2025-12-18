@@ -150,7 +150,7 @@ function [result] = simulate_packets(tx_cpy, rx_cpy, snr_dB, n_packets_per_snr, 
     % create channel configuration
     channel_config                      = dectnrp_channel.config_t();
     channel_config.verbosity            = 0;
-    channel_config.type                 = 'AWGN';
+    channel_config.type                 = 'Rayleigh';
     channel_config.N_TX                 = tx_cpy.derived.tm_mode.N_TX;
     channel_config.N_RX                 = rx_cpy.N_RX;
     channel_config.spectrum_occupied    = tx_cpy.derived.n_spectrum_occupied/tx_cpy.config.oversampling;
@@ -162,8 +162,8 @@ function [result] = simulate_packets(tx_cpy, rx_cpy, snr_dB, n_packets_per_snr, 
     channel_config.snr_db               = snr_dB;
     channel_config.r_samp_rate          = tx_cpy.derived.numerology.B_u_b_DFT*tx_cpy.config.oversampling;
     channel_config.r_max_doppler        = 0.0001;
-    channel_config.r_type               = 'TDL-ii';
-    channel_config.r_DS_desired         = 10^(-7.03 + 0.00*randn());
+    channel_config.r_type               = 'TDL-i';
+    channel_config.r_DS_desired         = 39*10-9;%10^(-7.03 + 0.00*randn());
     channel_config.r_K                  = db2pow(9.0 + 0.00*randn());
 
     % create channel

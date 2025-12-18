@@ -42,7 +42,7 @@ function [] = ber_per_over_snr_plot_for_one_mcs(prefix, mcs, snr_db, bps, tbs, b
     legend_location = 'NorthEast';
 
     snr_db_init=[-2, -1, 2, 4,8];
-    snr_db_end=snr_db_init+5;
+    snr_db_end=snr_db_init+6;
     snr_db_step=0.25;
 
     % K-factor of Rician channel
