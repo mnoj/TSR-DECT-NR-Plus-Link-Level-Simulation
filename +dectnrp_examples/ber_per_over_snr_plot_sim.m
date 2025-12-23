@@ -38,15 +38,38 @@ function [] = ber_per_over_snr_plot_for_one_mcs(prefix, mcs, snr_db, bps, tbs, b
               0.6350, 0.0780, 0.1840];
     legend_font_size = 8;
     marker_size = 4;
-    axis_lim = [-5 20 1e-7 1e1];
+    axis_lim = [-5 30 1e-7 1e1];
     legend_location = 'NorthEast';
 
-    snr_db_init=[-2, -1, 2, 4,8];
-    snr_db_end=snr_db_init+6;
-    snr_db_step=0.25;
+    snr_db_init=[-5, 5, 2, 4,8];
+    snr_db_end=snr_db_init+25;
+    snr_db_step=0.5;
 
     % K-factor of Rician channel
     K = db2pow(9.0);
+
+    % BER
+    figure()
+    clf()
+    for cnt = 1:1:numel(mcs)
+          % simulation range for link level simulation
+       
+        snr_db = snr_db_init(cnt):snr_db_step:snr_db_end(cnt);   
+        str = append('MCS=', num2str(mcs(cnt)), ', TBS=', num2str(tbs(cnt)));
+        semilogy(snr_db, ber(cnt,:),'-o','DisplayName',str, 'Color', colors(cnt, :), 'MarkerSize', marker_size, 'MarkerFaceColor', colors(cnt, :));
+        hold on
+    end
+
+        title(prefix)
+    xlabel('SNR (dB)')
+    ylabel('BER')
+    legend('Location',legend_location, 'FontSize', legend_font_size)
+    grid on
+    axis(axis_lim)
+    set(gca, 'ColorOrder', jet(100))
+    savefig("results/" + prefix + "_PER_SNR.fig")
+
+
   
     % PER
     figure()

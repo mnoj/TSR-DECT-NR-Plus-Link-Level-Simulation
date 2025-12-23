@@ -56,7 +56,7 @@ classdef tx_t < matlab.mixin.Copyable
             physical_resource_mapping_STF_cell = obj.derived.physical_resource_mapping_STF_cell;
             physical_resource_mapping_DRS_cell = obj.derived.physical_resource_mapping_DRS_cell;
 
-            %% clause 7, based on the generic procedures of clause 6
+            %% clause 7, based on the generic procr_DS_desirededures of clause 6
 
             % The receiver needs to know if signal is beamformed or not for channel sounding purposes.
             % 7.2
@@ -83,7 +83,6 @@ classdef tx_t < matlab.mixin.Copyable
                                                                                 rv, ...
                                                                                 mcs, ...
                                                                                 N_SS);
-                                                                        
             % Next we map PCC and PDC to spatial streams (ss), see Table 6.3.2-1.
             % For PCC, there is only one spatial stream.
             x_PCC_ss = {x_PCC};
@@ -123,7 +122,7 @@ classdef tx_t < matlab.mixin.Copyable
             
             % Beamforming (N_eff_TX many), remember N_eff_TX = N_TS
             antenna_streams_mapped = dectnrp_6_generic_procedures.Beamforming(transmit_streams, N_TX, codebook_index);
-
+            obj.config.ideal_ofdm_grid=antenna_streams_mapped; % mnoj
             % switch to time domain
             samples_antenna_tx = dectnrp_6_generic_procedures.ofdm_signal_generation_Cyclic_prefix_insertion(antenna_streams_mapped, ...
                                                                                                              k_b_OCC, ...

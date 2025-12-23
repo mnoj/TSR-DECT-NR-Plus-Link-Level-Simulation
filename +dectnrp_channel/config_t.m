@@ -22,6 +22,9 @@ classdef config_t < matlab.mixin.Copyable
         r_type;                 % Exponential Decay: TDL-i, TDL-ii, TDL-iii(NLOS) or TDL-iv, TDL-v (LOS) etc.
         r_DS_desired;           % scaling factor of normalized delay spread (e.g. according to ITU-R M.2412-0, Table A1-43)
         r_K;                    % Rician fading K factor
+
+       samples_antenna_rx_NoNoise  % Matrix storing the samples per RX antenna without noise
+
     end
     
     methods
@@ -63,6 +66,8 @@ classdef config_t < matlab.mixin.Copyable
             obj.sto_fractional      = 0;
             obj.cfo                 = 0;
             obj.err_phase           = 0;
+            obj.samples_antenna_rx_NoNoise = [];
+
 
 
             obj.snr_db              = 30;
@@ -74,15 +79,17 @@ classdef config_t < matlab.mixin.Copyable
             elseif strcmp(obj.type, 'Rayleigh') || strcmp(obj.type, 'Rician')
             
                 obj.r_samp_rate      = tx.derived.numerology.B_u_b_DFT*tx.config.oversampling;
-                obj.r_max_doppler    = 1.946;
-        
+                %obj.r_max_doppler    = 1.946;
+                obj.r_max_doppler    = 0.0000001;
+
                 if strcmp(obj.type, 'Rayleigh')
                     obj.r_type       = 'TDL-iii';
                 else
                     obj.r_type       = 'TDL-iv';
                 end
         
-                obj.r_DS_desired     = 10^(-7.03);
+                %obj.r_DS_desired     = 10^(-7.03);
+                obj.r_DS_desired     = 39;
                 obj.r_K              = db2pow(9.0);
             else
                 assert(false, 'unknown channel type %d', obj.type);

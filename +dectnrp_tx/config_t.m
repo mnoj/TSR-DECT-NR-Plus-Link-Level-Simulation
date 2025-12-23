@@ -15,6 +15,7 @@ classdef config_t < matlab.mixin.Copyable
         rv                  % HARQ version, values range from 0, 1, 2 to 3 (right HARQ re-transmission order is 0 2 3 1)
         network_id          % 7.6.6 must be given as a 32 bit vector with network_id(1) being the MSB, network_id must be known for scrambler on PHY
         verbosity           % 0 no plots, >=1 TX/RX/CH plots, >=2 RX synchronization plots
+        ideal_ofdm_grid     % Cell storing the ideal OFDM grid that will be used for IDEAL channel estimation mnoj
     end
     
     methods
@@ -37,6 +38,7 @@ classdef config_t < matlab.mixin.Copyable
             obj.PLCF_type = 2;
             obj.rv = 0;
             obj.network_id = de2bi(1e6,32,'left-msb');
+            obj.ideal_ofdm_grid = 0;
             obj.verbosity = 1;
         end
     end

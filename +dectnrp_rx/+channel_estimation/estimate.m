@@ -2,7 +2,9 @@ function [ch_estim] = estimate(antenna_streams_mapped_rev, ...
                                physical_resource_mapping_DRS_cell, ...
                                weights, ...
                                N_RX, ...
-                               N_eff_TX)
+                               N_eff_TX,...
+                              ideal_ofdm_grid,...
+                              antenna_streams_mapped_rev_NoNoise)
     % we need the size of the packet
     [N_b_DFT, N_PACKET_symb] = size(cell2mat(antenna_streams_mapped_rev(1)));
 
@@ -17,6 +19,8 @@ function [ch_estim] = estimate(antenna_streams_mapped_rev, ...
 
         % received f domain samples at antenna i
         transmit_streams_rev_i = cell2mat(antenna_streams_mapped_rev(i));
+        transmit_streams_ideal_i = cell2mat(ideal_ofdm_grid(i)); % Ideal OFDM grid
+        transmit_streams_rxNoNoise_i = cell2mat(antenna_streams_mapped_rev_NoNoise(i)); % Ideal OFDM grid
 
         % for each transmit stream
         for j=1:1:N_eff_TX
@@ -40,8 +44,9 @@ function [ch_estim] = estimate(antenna_streams_mapped_rev, ...
 
             %% interpolation, extrapolation and smoothing
             ch_estim_i(:,:,j)  = sum(ls.*cell2mat(weights(j)),3);
-            %%ch_estim_i(:,:,j) =  ch_estim_i(:,:,j) ./ ch_estim_i(:,:,j) ;
+            ch_estim_i(:,:,j) =  transmit_streams_rxNoNoise_i ./ (transmit_streams_ideal_i);
         end
+        ch_estim_i (isinf(ch_estim_i))  =1e-4;  
         ch_estim(i) = {ch_estim_i};
 
     end

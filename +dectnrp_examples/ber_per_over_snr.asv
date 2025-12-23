@@ -21,16 +21,19 @@ function [] = ber_per_over_snr()
     
     % choose mcs to simulate and maximum number of HARQ re-transmissions
     mcs = [0,1,2,3,4];
+    mcs = [0];
+
     harq_retransmissions = 0;
     
     % simulation range for link level simulation
-    snr_db_init=[-3, 0, 3, 5,9];
-    snr_db_end=snr_db_init+5;
-    snr_db_step=0.25;
+    snr_db_init=[5, -1, 2, 4,8];
+
+    snr_db_end=snr_db_init+30;
+    snr_db_step=1;
     snr_db = snr_db_init(1):snr_db_step:snr_db_end(1);              % First test vector for defining the variables.
 
     % Packets per mcs and snr. Increase this number to get smoother curves.
-    n_packets_per_snr = 20000;
+    n_packets_per_snr = 500;
     
     % result container for PCC
     n_bits_PCC_sent = zeros(numel(mcs), numel(snr_db(1,:)));        % BER uncoded
@@ -47,6 +50,8 @@ function [] = ber_per_over_snr()
     % bits per symbol, transport block size
     bps = zeros(numel(mcs), 1);
     tbs = zeros(numel(mcs), 1);
+
+    jj=0;
     
     for cnt = 1:numel(mcs)
 
@@ -60,7 +65,7 @@ function [] = ber_per_over_snr()
         config.u = 1;
         config.b = 1;
         config.PacketLengthType = 0;
-        config.PacketLength = 2;
+        config.PacketLength = 3;
         config.tm_mode_0_to_11 = 0; 
         config.mcs_index = mcs(cnt);
         config.Z = 2048;
@@ -142,7 +147,6 @@ function [result] = simulate_packets(tx_cpy, rx_cpy, snr_dB, n_packets_per_snr, 
     n_bits_PCC_sent = 0;
     n_bits_PCC_error = 0;
     n_packets_PCC_error = 0;
-
     n_bits_PDC_sent = 0;
     n_bits_PDC_error = 0;
     n_packets_PDC_error = 0;
@@ -150,7 +154,7 @@ function [result] = simulate_packets(tx_cpy, rx_cpy, snr_dB, n_packets_per_snr, 
     % create channel configuration
     channel_config                      = dectnrp_channel.config_t();
     channel_config.verbosity            = 0;
-    channel_config.type                 = 'AWGN';
+    channel_config.type                 = 'Rayleigh';
     channel_config.N_TX                 = tx_cpy.derived.tm_mode.N_TX;
     channel_config.N_RX                 = rx_cpy.N_RX;
     channel_config.spectrum_occupied    = tx_cpy.derived.n_spectrum_occupied/tx_cpy.config.oversampling;
@@ -162,8 +166,8 @@ function [result] = simulate_packets(tx_cpy, rx_cpy, snr_dB, n_packets_per_snr, 
     channel_config.snr_db               = snr_dB;
     channel_config.r_samp_rate          = tx_cpy.derived.numerology.B_u_b_DFT*tx_cpy.config.oversampling;
     channel_config.r_max_doppler        = 0.0001;
-    channel_config.r_type               = 'TDL-ii';
-    channel_config.r_DS_desired         = 10^(-7.03 + 0.00*randn());
+    channel_config.r_type               = 'TDL-i';
+    channel_config.r_DS_desired         = 39e-9;%10^(-7.03 + 0.00*randn());
     channel_config.r_K                  = db2pow(9.0 + 0.00*randn());
 
     % create channel
@@ -213,12 +217,12 @@ function [result] = simulate_packets(tx_cpy, rx_cpy, snr_dB, n_packets_per_snr, 
 
             % pass samples through channel
             samples_antenna_rx = channel.pass_samples(samples_antenna_tx, 0);
-            
+            samples_antenna_rx_NoNoise = channel.config.samples_antenna_rx_NoNoise;
             % make next channel impulse response independent from this one
             channel.reset_random_Rayleigh_Rician();
 
             % now let rx decode the packet
-            rx_cpy.demod_decode_packet(samples_antenna_rx);
+            rx_cpy.demod_decode_packet(samples_antenna_rx,samples_antenna_rx_NoNoise );
 
             assert(numel(tx_cpy.packet_data.pcc_enc_dbg.d) == 196);
             
@@ -227,7 +231,7 @@ function [result] = simulate_packets(tx_cpy, rx_cpy, snr_dB, n_packets_per_snr, 
             n_bits_PCC_error = n_bits_PCC_error + rx_cpy.get_pcc_bit_errors_uncoded(tx_cpy);
             n_bits_PDC_sent = n_bits_PDC_sent + numel(tx_cpy.packet_data.pdc_enc_dbg.d);
             n_bits_PDC_error = n_bits_PDC_error + rx_cpy.get_pdc_bit_errors_uncoded(tx_cpy);
-            
+            %rx_cpy.get_pdc_bit_errors_uncoded(tx_cpy);
             % we might be done
             if rx_cpy.are_plcf_bits_equal(tx_cpy)
                 pcc_decoded_successfully = true;

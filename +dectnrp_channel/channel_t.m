@@ -74,7 +74,12 @@ classdef channel_t < handle
             
             % thermal noise
             for i=1:1:obj.config.N_RX
-                samples_antenna_rx(:,i) = awgn(samples_antenna_rx(:,i), obj.config.snr_db, pow2db(1/obj.config.spectrum_occupied));
+                samples_antenna_rx_NoNoise(:,i) = samples_antenna_rx(:,i); % Save the channel without noise for perfect channel estimation
+               % samples_antenna_rx(:,i) = awgn(samples_antenna_rx(:,i), obj.config.snr_db, pow2db(1/obj.config.spectrum_occupied));
+                samples_antenna_rx(:,i) = awgn(samples_antenna_rx(:,i), obj.config.snr_db, pow2db(mean(abs(samples_antenna_rx(:,i)).^2)/obj.config.spectrum_occupied)); % The noise is added dependig on the channel output power
+
+                obj.config.samples_antenna_rx_NoNoise(:,i) = samples_antenna_rx_NoNoise(:,i) ;
+
             end
 
             if obj.config.verbosity >= 1
@@ -152,10 +157,16 @@ classdef channel_t < handle
             [pathDelays_beforeInterpolation, avgPathGains_beforeInterpolation] = dectnrp_channel.get_PDP_from_literature(obj.config.r_type, ...
                                                                                                                          obj.config.r_DS_desired);
             
-            % interpolate to system sample rate
-            [pathDelays, avgPathGains] = obj.interpolate_power_delay_profile_to_system_sample_rate(pathDelays_beforeInterpolation, ...
-                                                                                                   avgPathGains_beforeInterpolation);
+            % interpolate to system sample rate  % I am not interpolating
+            % the PPD according to the sample rate
+          %  [pathDelays, avgPathGains] = obj.interpolate_power_delay_profile_to_system_sample_rate(pathDelays_beforeInterpolation, ...
+          %                                                                                       avgPathGains_beforeInterpolation);
+            pathDelays=pathDelays_beforeInterpolation;
+            avgPathGains=avgPathGains_beforeInterpolation;
             
+            %%%
+
+
             assert(numel(pathDelays) == numel(unique(pathDelays)));
             assert(sum(pathDelays < 0) == 0);
             assert(sum(isnan(avgPathGains)) == 0);
@@ -191,7 +202,7 @@ classdef channel_t < handle
                                                          'TransmitCorrelationMatrix', eye(obj.config.N_TX), ...
                                                          'ReceiveCorrelationMatrix', eye(obj.config.N_RX), ... % SpatialCorrelationMatrix
                                                          'AntennaSelection', 'off', ...
-                                                         'NormalizeChannelOutputs', false, ...
+                                                         'NormalizeChannelOutputs', false, ... 
                                                          'FadingTechnique', 'Sum of sinusoids', ...
                                                          'NumSinusoids', 48, ...
                                                          'InitialTimeSource', 'Input Port', ... % InitialTime
